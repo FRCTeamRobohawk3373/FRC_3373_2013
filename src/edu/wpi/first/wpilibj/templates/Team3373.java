@@ -507,7 +507,7 @@ public class Team3373 extends SimpleRobot{
            
            if (!controlFlag){
                 elevator.lower();
-                if (elevator.lowerLimit.get()){
+                if (elevator.lowerLimitL.get()){
                     elevator.off();
                     controlFlag = true;
                 }
@@ -531,19 +531,21 @@ public class Team3373 extends SimpleRobot{
     public void test() {
         
         while (isEnabled() && isTest()) {
-            if (shooterController.isRBHeld()){
-                elevator.raise();
-            } else if (shooterController.isLBHeld()){
-               elevator.lower(); 
-            } else elevator.off();
-            
-            if (shooterController.isAPushed()){
-                objShooter.shooterThread();
-            }
-            drive.setSpeed(driveStick.isLBHeld(), driveStick.isRBHeld());
-            drive.drive(newMath.toTheThird(deadband.zero(driveStick.getRawAxis(LX), 0.1)), newMath.toTheThird(deadband.zero(driveStick.getRawAxis(RX), 0.1)), newMath.toTheThird(deadband.zero(driveStick.getRawAxis(LY), 0.1)));  
-            SmartDashboard.putNumber("String Pot", elevator.stringPotL.getVoltage());
+            if (shooterController.isAHeld()){
+                elevator.elevatorTalonL.set(.5);
+            } else if (shooterController.isBHeld() && !elevator.lowerLimitL.get()){
+                elevator.elevatorTalonR.set(-.5);
+            } else elevator.elevatorTalonL.set(0);
+            if (shooterController.isXHeld()) {
+                elevator.elevatorTalonR.set(.5);
+            } else if (shooterController.isYHeld() && !elevator.lowerLimitR.get()){
+                elevator.elevatorTalonR.set(-.5);
+            } else elevator.elevatorTalonR.set(0);
             //System.out.println("Limit: " + objShooter.shootLimit.get());
+            SmartDashboard.putNumber("Left Pot", elevator.currentAngleL);
+            SmartDashboard.putNumber("Right Pot", elevator.currentAngleR);
+            SmartDashboard.putBoolean("LeftLimit: ", elevator.lowerLimitL.get());
+            SmartDashboard.putBoolean("RightLimit", elevator.lowerLimitR.get());
         }   
     }
 }

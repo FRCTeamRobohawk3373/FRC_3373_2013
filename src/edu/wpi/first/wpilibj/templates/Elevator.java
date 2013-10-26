@@ -28,7 +28,8 @@ public class Elevator {
     //Talon elevatorTalon2 = new Talon(8);
     Talon elevatorTalonL = new Talon(7);
     Talon elevatorTalonR = new Talon(8);
-    DigitalInput lowerLimit = new DigitalInput(4);
+    DigitalInput lowerLimitL = new DigitalInput(7);
+    DigitalInput lowerLimitR = new DigitalInput(8);
     
     // Used by voltage averaging/ smoothing method
     int arraySize = 1000;
@@ -42,8 +43,8 @@ public class Elevator {
     double whileCount = 0;
 
     AnalogChannel angleMeter = new AnalogChannel(1);
-    static AnalogChannel stringPotL = new AnalogChannel(3);
-    static AnalogChannel stringPotR = new AnalogChannel(4);    
+    static AnalogChannel stringPotL = new AnalogChannel(5);
+    static AnalogChannel stringPotR = new AnalogChannel(6);    
     double minLimit = 0.824;//this must be changed to stringPot min
     double maxLimit = 2.703; //this must be changed to stingPot Max
     double minDegrees = 21.9;
@@ -52,8 +53,8 @@ public class Elevator {
     double pwmModifier = .85;
     double elevatorTarget;
     boolean canRun = true;
-    double currentAngleL = stringPotL.getVoltage(); //changed to string pot so that goTo works
-    double currentAngleR = stringPotR.getVoltage(); //ditto
+    static double currentAngleL = stringPotL.getVoltage(); //changed to string pot so that goTo works
+    static double currentAngleR = stringPotR.getVoltage(); //ditto
     double elevationTarget = angleMeter.getVoltage();;
     boolean goToFlag = false;
     double slope;
@@ -63,17 +64,30 @@ public class Elevator {
     double shootTarget;
     static double smallerDBL = .05;
     //double angle = 41(voltage - 2.5) + 21.9;
+    
+    
+    //angle scaler
+    static double MAXVOLTAGE_R = 4.2;
+    static double MAXANGLE_R = 40;
+    static double MINANGLE_R = 8;
+    static double MINVOLTAGE_R = 2.5;
+    
+    static double MAXVOLTAGE_L = 4.2;
+    static double MAXANGLE_L = 40;
+    static double MINANGLE_L = 8;
+    static double MINVOLTAGE_L = 2.5;
+    
     public void raise(){
         elevatorTalonL.set(basePWM);
         elevatorTalonR.set(basePWM * pwmModifier);
     }
     
     public void lower(){
-        if (lowerLimit.get() || currentAngleL < minLimit){
+        if (lowerLimitL.get() || currentAngleL < minLimit){
                 off();
                 return;
             }
-        if (!lowerLimit.get() && currentAngleL > minLimit){
+        if (!lowerLimitL.get() && currentAngleL > minLimit){
             elevatorTalonL.set(-basePWM);
             elevatorTalonR.set(-basePWM * pwmModifier);
             }
@@ -217,7 +231,7 @@ public class Elevator {
                 while ((target - currentAngleL) > smallerDBL){
                     if (target > currentAngleL){
                         elevatorTalonL.set(basePWM - deltaV);
-                    } else if (target < currentAngleL){
+                    } else if (target < currentAngleL && lowerLimitL.get()){
                         elevatorTalonL.set(-basePWM - deltaV);
                     }
                 }
@@ -231,10 +245,10 @@ public class Elevator {
         
         final Thread thread = new Thread(new Runnable() {
             public void run(){
-                while ((target - currentAngleR) > smallerDBL){
-                    if (target > currentAngleR){
+                while ((target - getDegreesR()) > smallerDBL){
+                    if (target > getDegreesR()){
                         elevatorTalonR.set(basePWM + deltaV);
-                    } else if (target < currentAngleL){
+                    } else if (target < getDegreesR() && !lowerLimitR.get()){
                         elevatorTalonR.set(-basePWM + deltaV);
                     }
                 }
@@ -242,5 +256,15 @@ public class Elevator {
             }    
         });
         thread.start();;
+    }
+        
+    public static double getDegreesR(){
+        double angle = (((MAXANGLE_R - MINANGLE_R)/(MAXVOLTAGE_R - MINVOLTAGE_R))*(currentAngleR - MINVOLTAGE_R) + MINANGLE_R);
+        return angle;
+    }
+    
+    public static double getDegreesL(){
+        double angle = (((MAXANGLE_L - MINANGLE_L)/(MAXVOLTAGE_L - MINVOLTAGE_L))*(currentAngleL - MINVOLTAGE_L) + MINANGLE_L);
+        return angle;
     }
 }
