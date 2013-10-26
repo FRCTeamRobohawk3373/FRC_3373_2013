@@ -26,8 +26,8 @@ public class Elevator {
     }
     
     //Talon elevatorTalon2 = new Talon(8);
-    Talon elevatorTalon1 = new Talon(7);
-    Talon elevatorTalon2 = new Talon(8);
+    Talon elevatorTalonL = new Talon(7);
+    Talon elevatorTalonR = new Talon(8);
     DigitalInput lowerLimit = new DigitalInput(4);
     
     // Used by voltage averaging/ smoothing method
@@ -42,8 +42,8 @@ public class Elevator {
     double whileCount = 0;
 
     AnalogChannel angleMeter = new AnalogChannel(1);
-    AnalogChannel stringPot = new AnalogChannel(3);
-    
+    static AnalogChannel stringPotL = new AnalogChannel(3);
+    static AnalogChannel stringPotR = new AnalogChannel(4);    
     double minLimit = 0.824;//this must be changed to stringPot min
     double maxLimit = 2.703; //this must be changed to stingPot Max
     double minDegrees = 21.9;
@@ -52,7 +52,8 @@ public class Elevator {
     double pwmModifier = .85;
     double elevatorTarget;
     boolean canRun = true;
-    double currentAngle = stringPot.getVoltage(); //changed to string pot so that goTo works
+    double currentAngleL = stringPotL.getVoltage(); //changed to string pot so that goTo works
+    double currentAngleR = stringPotR.getVoltage(); //ditto
     double elevationTarget = angleMeter.getVoltage();;
     boolean goToFlag = false;
     double slope;
@@ -60,26 +61,27 @@ public class Elevator {
     boolean elevateFlag = true;
     boolean isThreadRunning = false;
     double shootTarget;
+    static double smallerDBL = .05;
     //double angle = 41(voltage - 2.5) + 21.9;
     public void raise(){
-        elevatorTalon1.set(basePWM);
-        elevatorTalon2.set(basePWM * pwmModifier);
+        elevatorTalonL.set(basePWM);
+        elevatorTalonR.set(basePWM * pwmModifier);
     }
     
     public void lower(){
-        if (lowerLimit.get() || currentAngle < minLimit){
+        if (lowerLimit.get() || currentAngleL < minLimit){
                 off();
                 return;
             }
-        if (!lowerLimit.get() && currentAngle > minLimit){
-            elevatorTalon1.set(-basePWM);
-            elevatorTalon2.set(-basePWM * pwmModifier);
+        if (!lowerLimit.get() && currentAngleL > minLimit){
+            elevatorTalonL.set(-basePWM);
+            elevatorTalonR.set(-basePWM * pwmModifier);
             }
             
         }
     public void off(){
-        elevatorTalon1.set(0);
-        elevatorTalon2.set(0);
+        elevatorTalonL.set(0);
+        elevatorTalonR.set(0);
     }
    public double elevatorAngleMath(){
        slope = (maxDegrees - minDegrees)/(maxLimit - minLimit);
@@ -127,14 +129,14 @@ public class Elevator {
     public void goToAngle(){
         //at the moment elevatorTarget is a voltage, 
         //TODO: make some sort of conversion from voltage to angle
-        currentAngle = getAverageVoltage2(); 
-        if (Math.abs(elevationTarget - currentAngle) <= .1){//TODO: check angle
+        currentAngleL = getAverageVoltage2(); 
+        if (Math.abs(elevationTarget - currentAngleL) <= .1){//TODO: check angle
             off();
            // System.out.println("off");
-        } else if (elevationTarget > currentAngle && elevationTarget < maxLimit){
+        } else if (elevationTarget > currentAngleL && elevationTarget < maxLimit){
             raise();
             //System.out.println("raise");
-        } else if (elevationTarget < currentAngle && elevationTarget > minLimit){
+        } else if (elevationTarget < currentAngleL && elevationTarget > minLimit){
             //System.out.println("lower");
         } 
         
@@ -148,25 +150,25 @@ public class Elevator {
         public void run(){
                 goToFlag = false;
                 isThreadRunning = true;
-                currentAngle = stringPot.getVoltage(); //change happened here
+                currentAngleL = stringPotL.getVoltage(); //change happened here
                 shootTarget = target;
-                    while(target > currentAngle  && target < maxLimit && currentAngle < maxLimit&& elevateFlag){
+                    while(target > currentAngleL  && target < maxLimit && currentAngleL < maxLimit&& elevateFlag){
                         try {
                             Thread.sleep(40L);
                         } catch (InterruptedException ex) {
                             ex.printStackTrace();
                         }
-                        currentAngle = stringPot.getVoltage();//change happened here
+                        currentAngleL = stringPotL.getVoltage();//change happened here
                         //System.out.println("raise " + target);
                         raise();
-                        if(target < currentAngle){
+                        if(target < currentAngleL){
                             elevateFlag = false;
                             canRun = true;
                             break;
                         }
                     }
-                    while(target < currentAngle && target > minLimit && currentAngle > minLimit&& elevateFlag){
-                        currentAngle = stringPot.getVoltage();//change happened here
+                    while(target < currentAngleL && target > minLimit && currentAngleL > minLimit&& elevateFlag){
+                        currentAngleL = stringPotL.getVoltage();//change happened here
                         try {
                             Thread.sleep(40L);
                         } catch (InterruptedException ex) {
@@ -174,7 +176,7 @@ public class Elevator {
                         }
                         //System.out.println("lower " + target);
                         lower();
-                        if(target > currentAngle){
+                        if(target > currentAngleL){
                             elevateFlag = false;
                             canRun = true;
                             break;
@@ -196,4 +198,49 @@ public class Elevator {
             elevatorTarget += -.1;
         }
     }*/
+    
+    public void goToPotAngle(double deltaV, double target, double deltaPosition){
+        double DBL = .10; //deadband Constant
+        if (deltaPosition > DBL){
+            elevationThreadL(target, deltaV);
+            elevationThreadR(target, deltaV);
+        } else {
+            elevatorTalonR.set(0);
+            elevatorTalonL.set(0);
+        }
+    }
+    
+    public void elevationThreadL(final double target, final double deltaV){
+        
+        final Thread thread = new Thread(new Runnable() {
+            public void run(){
+                while ((target - currentAngleL) > smallerDBL){
+                    if (target > currentAngleL){
+                        elevatorTalonL.set(basePWM - deltaV);
+                    } else if (target < currentAngleL){
+                        elevatorTalonL.set(-basePWM - deltaV);
+                    }
+                }
+                elevatorTalonL.set(0);
+            }    
+        });
+        thread.start();;
+    }
+    
+        public void elevationThreadR(final double target, final double deltaV){
+        
+        final Thread thread = new Thread(new Runnable() {
+            public void run(){
+                while ((target - currentAngleR) > smallerDBL){
+                    if (target > currentAngleR){
+                        elevatorTalonR.set(basePWM + deltaV);
+                    } else if (target < currentAngleL){
+                        elevatorTalonR.set(-basePWM + deltaV);
+                    }
+                }
+                elevatorTalonR.set(0);
+            }    
+        });
+        thread.start();;
+    }
 }
