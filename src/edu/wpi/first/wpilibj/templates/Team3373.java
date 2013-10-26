@@ -206,8 +206,8 @@ public class Team3373 extends SimpleRobot{
             objShooter.stageOneTalon.set(0);
             objShooter.stageTwoTalon.set(0);
             camera.distFlag = false;
-            elevator.elevatorTalon1.set(0);
-            elevator.elevatorTalon2.set(0);
+            elevator.elevatorTalonL.set(0);
+            elevator.elevatorTalonR.set(0);
             elevator.canRun = false;
             camera.canRun = false;
             objShooter.canRun = false;
@@ -521,7 +521,7 @@ public class Team3373 extends SimpleRobot{
              * Goto starting height: 2.668
              ************/
             double stringPotVoltage;
-            stringPotVoltage = elevator.stringPot.getVoltage();
+            stringPotVoltage = elevator.stringPotL.getVoltage();
             //System.out.println(stringPotVoltage);
             SmartDashboard.putBoolean("canRun", elevator.canRun);
         
@@ -542,7 +542,7 @@ public class Team3373 extends SimpleRobot{
             }
             drive.setSpeed(driveStick.isLBHeld(), driveStick.isRBHeld());
             drive.drive(newMath.toTheThird(deadband.zero(driveStick.getRawAxis(LX), 0.1)), newMath.toTheThird(deadband.zero(driveStick.getRawAxis(RX), 0.1)), newMath.toTheThird(deadband.zero(driveStick.getRawAxis(LY), 0.1)));  
-            SmartDashboard.putNumber("String Pot", elevator.stringPot.getVoltage());
+            SmartDashboard.putNumber("String Pot", elevator.stringPotL.getVoltage());
             //System.out.println("Limit: " + objShooter.shootLimit.get());
         }   
     }
