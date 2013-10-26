@@ -15,9 +15,9 @@ public class ElevatorLevelCheck implements Runnable{
             AnalogChannel stringPotR = new AnalogChannel(7);//just a place holder
         
             double deltaV;
-            double c = 5;//modifier to make an acceptable value at which to change the speed of elevator motors
+            double c = 0.05;//modifier to make an acceptable value at which to change the speed of elevator motors
         
-            deltaV = (stringPotL.getVoltage()-stringPotR.getVoltage()) * c;
+            deltaV = (getDegreesL()-getDegreesR()) * c;
             
             try {
             Thread.sleep(100);
