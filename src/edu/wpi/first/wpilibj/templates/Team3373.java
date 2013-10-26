@@ -507,7 +507,7 @@ public class Team3373 extends SimpleRobot{
            
            if (!controlFlag){
                 elevator.lower();
-                if (elevator.lowerLimit.get()){
+                if (elevator.lowerLimitL.get()){
                     elevator.off();
                     controlFlag = true;
                 }

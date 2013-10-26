@@ -28,7 +28,8 @@ public class Elevator {
     //Talon elevatorTalon2 = new Talon(8);
     Talon elevatorTalonL = new Talon(7);
     Talon elevatorTalonR = new Talon(8);
-    DigitalInput lowerLimit = new DigitalInput(4);
+    DigitalInput lowerLimitL = new DigitalInput(4);
+    DigitalInput lowerLimitR = new DigitalInput(5);
     
     // Used by voltage averaging/ smoothing method
     int arraySize = 1000;
@@ -63,17 +64,29 @@ public class Elevator {
     double shootTarget;
     static double smallerDBL = .05;
     //double angle = 41(voltage - 2.5) + 21.9;
+    
+    
+    //angle scaler
+    double MAXVOLTAGE_R = 4.2;
+    double MAXANGLE_R = 40;
+    double MINANGLE_R = 8;
+    double MINVOLTAGE_R = 2.5;
+    
+    double MAXVOLTAGE_L = 4.2;
+    double MAXANGLE_L = 40;
+    double MINANGLE_L = 8;
+    double MINVOLTAGE_L = 2.5;
     public void raise(){
         elevatorTalonL.set(basePWM);
         elevatorTalonR.set(basePWM * pwmModifier);
     }
     
     public void lower(){
-        if (lowerLimit.get() || currentAngleL < minLimit){
+        if (lowerLimitL.get() || currentAngleL < minLimit){
                 off();
                 return;
             }
-        if (!lowerLimit.get() && currentAngleL > minLimit){
+        if (!lowerLimitL.get() && currentAngleL > minLimit){
             elevatorTalonL.set(-basePWM);
             elevatorTalonR.set(-basePWM * pwmModifier);
             }
@@ -217,7 +230,7 @@ public class Elevator {
                 while ((target - currentAngleL) > smallerDBL){
                     if (target > currentAngleL){
                         elevatorTalonL.set(basePWM - deltaV);
-                    } else if (target < currentAngleL){
+                    } else if (target < currentAngleL && lowerLimitL.get()){
                         elevatorTalonL.set(-basePWM - deltaV);
                     }
                 }
@@ -234,7 +247,7 @@ public class Elevator {
                 while ((target - currentAngleR) > smallerDBL){
                     if (target > currentAngleR){
                         elevatorTalonR.set(basePWM + deltaV);
-                    } else if (target < currentAngleL){
+                    } else if (target < currentAngleL && !lowerLimitR.get()){
                         elevatorTalonR.set(-basePWM + deltaV);
                     }
                 }
@@ -242,5 +255,15 @@ public class Elevator {
             }    
         });
         thread.start();;
+    }
+        
+    public double getDegreesR(){
+        double angle = (((MAXANGLE_R - MINANGLE_R)/(MAXVOLTAGE_R - MINVOLTAGE_R))*(currentAngleR - MINVOLTAGE_R) + MINANGLE_R);
+        return angle;
+    }
+    
+    public double getDegreesL(){
+        double angle = (((MAXANGLE_L - MINANGLE_L)/(MAXVOLTAGE_L - MINVOLTAGE_L))*(currentAngleL - MINVOLTAGE_L) + MINANGLE_L);
+        return angle;
     }
 }
