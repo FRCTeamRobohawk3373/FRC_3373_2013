@@ -53,8 +53,8 @@ public class Elevator {
     double pwmModifier = .85;
     double elevatorTarget;
     boolean canRun = true;
-    double currentAngleL = stringPotL.getVoltage(); //changed to string pot so that goTo works
-    double currentAngleR = stringPotR.getVoltage(); //ditto
+    static double currentAngleL = stringPotL.getVoltage(); //changed to string pot so that goTo works
+    static double currentAngleR = stringPotR.getVoltage(); //ditto
     double elevationTarget = angleMeter.getVoltage();;
     boolean goToFlag = false;
     double slope;
@@ -67,15 +67,16 @@ public class Elevator {
     
     
     //angle scaler
-    double MAXVOLTAGE_R = 4.2;
-    double MAXANGLE_R = 40;
-    double MINANGLE_R = 8;
-    double MINVOLTAGE_R = 2.5;
+    static double MAXVOLTAGE_R = 4.2;
+    static double MAXANGLE_R = 40;
+    static double MINANGLE_R = 8;
+    static double MINVOLTAGE_R = 2.5;
     
-    double MAXVOLTAGE_L = 4.2;
-    double MAXANGLE_L = 40;
-    double MINANGLE_L = 8;
-    double MINVOLTAGE_L = 2.5;
+    static double MAXVOLTAGE_L = 4.2;
+    static double MAXANGLE_L = 40;
+    static double MINANGLE_L = 8;
+    static double MINVOLTAGE_L = 2.5;
+    
     public void raise(){
         elevatorTalonL.set(basePWM);
         elevatorTalonR.set(basePWM * pwmModifier);
@@ -244,10 +245,10 @@ public class Elevator {
         
         final Thread thread = new Thread(new Runnable() {
             public void run(){
-                while ((target - currentAngleR) > smallerDBL){
-                    if (target > currentAngleR){
+                while ((target - getDegreesR()) > smallerDBL){
+                    if (target > getDegreesR()){
                         elevatorTalonR.set(basePWM + deltaV);
-                    } else if (target < currentAngleL && !lowerLimitR.get()){
+                    } else if (target < getDegreesR() && !lowerLimitR.get()){
                         elevatorTalonR.set(-basePWM + deltaV);
                     }
                 }
@@ -257,12 +258,12 @@ public class Elevator {
         thread.start();;
     }
         
-    public double getDegreesR(){
+    public static double getDegreesR(){
         double angle = (((MAXANGLE_R - MINANGLE_R)/(MAXVOLTAGE_R - MINVOLTAGE_R))*(currentAngleR - MINVOLTAGE_R) + MINANGLE_R);
         return angle;
     }
     
-    public double getDegreesL(){
+    public static double getDegreesL(){
         double angle = (((MAXANGLE_L - MINANGLE_L)/(MAXVOLTAGE_L - MINVOLTAGE_L))*(currentAngleL - MINVOLTAGE_L) + MINANGLE_L);
         return angle;
     }
