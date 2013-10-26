@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.templates;
 
 //(new Thread(new ElevatorLevelCheck())).start();
@@ -9,12 +5,7 @@ package edu.wpi.first.wpilibj.templates;
 import edu.wpi.first.wpilibj.AnalogChannel;
 
 public class ElevatorLevelCheck implements Runnable{
-    
 
-    
-    public ElevatorLevelCheck(){
-    }
-    
     public void run(){
         //(L-R)*A= +-DeltaV
         //LV - DeltaV = L
@@ -28,9 +19,9 @@ public class ElevatorLevelCheck implements Runnable{
         
             deltaV = (stringPotL.getVoltage()-stringPotR.getVoltage()) * c;
             
+            try {
             Thread.sleep(100);
-            
+            } catch (InterruptedException e){}
         }
     }
-    
 }
