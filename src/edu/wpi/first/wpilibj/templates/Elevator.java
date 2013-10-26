@@ -28,8 +28,8 @@ public class Elevator {
     //Talon elevatorTalon2 = new Talon(8);
     Talon elevatorTalonL = new Talon(7);
     Talon elevatorTalonR = new Talon(8);
-    DigitalInput lowerLimitL = new DigitalInput(4);
-    DigitalInput lowerLimitR = new DigitalInput(5);
+    DigitalInput lowerLimitL = new DigitalInput(7);
+    DigitalInput lowerLimitR = new DigitalInput(8);
     
     // Used by voltage averaging/ smoothing method
     int arraySize = 1000;
@@ -43,8 +43,8 @@ public class Elevator {
     double whileCount = 0;
 
     AnalogChannel angleMeter = new AnalogChannel(1);
-    static AnalogChannel stringPotL = new AnalogChannel(3);
-    static AnalogChannel stringPotR = new AnalogChannel(4);    
+    static AnalogChannel stringPotL = new AnalogChannel(5);
+    static AnalogChannel stringPotR = new AnalogChannel(6);    
     double minLimit = 0.824;//this must be changed to stringPot min
     double maxLimit = 2.703; //this must be changed to stingPot Max
     double minDegrees = 21.9;
