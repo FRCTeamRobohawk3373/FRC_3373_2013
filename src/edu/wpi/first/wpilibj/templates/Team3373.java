@@ -32,6 +32,7 @@ public class Team3373 extends SimpleRobot{
    //SmartDashboard smartDashboard;
    SuperJoystick driveStick = new SuperJoystick(1); 
    SuperJoystick shooterController = new SuperJoystick(2);
+   ElevatorLevelCheck levelCheck = new ElevatorLevelCheck();
    
    //Deadband objDeadband = new Deadband();
    Timer robotTimer = new Timer();
@@ -532,20 +533,25 @@ public class Team3373 extends SimpleRobot{
         
         while (isEnabled() && isTest()) {
             if (shooterController.isAHeld()){
-                elevator.elevatorTalonL.set(.5);
+                elevator.elevatorTalonL.set(.4);
             } else if (shooterController.isBHeld() && !elevator.lowerLimitL.get()){
-                elevator.elevatorTalonR.set(-.5);
+                elevator.elevatorTalonR.set(-.4);
             } else elevator.elevatorTalonL.set(0);
             if (shooterController.isXHeld()) {
-                elevator.elevatorTalonR.set(.5);
+                elevator.elevatorTalonR.set(.4);
             } else if (shooterController.isYHeld() && !elevator.lowerLimitR.get()){
-                elevator.elevatorTalonR.set(-.5);
+                elevator.elevatorTalonR.set(-.4);
             } else elevator.elevatorTalonR.set(0);
             //System.out.println("Limit: " + objShooter.shootLimit.get());
             SmartDashboard.putNumber("Left Pot", elevator.currentAngleL);
             SmartDashboard.putNumber("Right Pot", elevator.currentAngleR);
             SmartDashboard.putBoolean("LeftLimit: ", elevator.lowerLimitL.get());
             SmartDashboard.putBoolean("RightLimit", elevator.lowerLimitR.get());
+            SmartDashboard.putNumber("DeltaV: ", elevator.deltaV());
+            SmartDashboard.putNumber("LDegrees", elevator.getDegreesL());
+            SmartDashboard.putNumber("RDegrees", elevator.getDegreesR());
+            elevator.goToPotAngle(target);
+            LiveWindow.setEnabled(false);
         }   
     }
 }

@@ -13,8 +13,7 @@ public class ElevatorLevelCheck implements Runnable{
         //LV - DeltaV = L
         //RV + DeltaV = R
         while (true){
-            AnalogChannel stringPotL = new AnalogChannel(3);//just a place holder
-            AnalogChannel stringPotR = new AnalogChannel(7);//just a place holder
+
         
             double deltaV;
             double c = 0.05;//modifier to make an acceptable value at which to change the speed of elevator motors

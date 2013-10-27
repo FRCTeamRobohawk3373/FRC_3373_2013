@@ -62,7 +62,7 @@ public class Elevator {
     boolean elevateFlag = true;
     boolean isThreadRunning = false;
     double shootTarget;
-    static double smallerDBL = .05;
+    static double smallerDBL = 1;
     //double angle = 41(voltage - 2.5) + 21.9;
     
     
@@ -213,50 +213,70 @@ public class Elevator {
         }
     }*/
     
-    public void goToPotAngle(double deltaV, double target, double deltaPosition){
-        double DBL = .10; //deadband Constant
+    public void goToPotAngle(double target){
+        double DBL = 2; //deadband Constant
+        double deltaPosition = target - getDegreesL();
         if (deltaPosition > DBL){
-            elevationThreadL(target, deltaV);
-            elevationThreadR(target, deltaV);
+            elevationThreadL(target);
+            elevationThreadR(target);
         } else {
             elevatorTalonR.set(0);
             elevatorTalonL.set(0);
         }
     }
     
-    public void elevationThreadL(final double target, final double deltaV){
+    public void elevationThreadL(final double target){
         
         final Thread thread = new Thread(new Runnable() {
             public void run(){
-                while ((target - currentAngleL) > smallerDBL){
+                isThreadRunning = true;
+                while ((target - currentAngleL) > smallerDBL && Math.abs(getDegreesR() - getDegreesL()) > 5){
                     if (target > currentAngleL){
-                        elevatorTalonL.set(basePWM - deltaV);
-                    } else if (target < currentAngleL && lowerLimitL.get()){
-                        elevatorTalonL.set(-basePWM - deltaV);
+                        elevatorTalonL.set(basePWM - deltaV());
+                    } else if (target < currentAngleL && !lowerLimitL.get()){
+                        elevatorTalonL.set(-basePWM - deltaV());
+                    } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
+                        elevatorTalonL.set(0);
+                        break;
                     }
                 }
                 elevatorTalonL.set(0);
+                isThreadRunning = false;
             }    
         });
-        thread.start();;
+        if (!isThreadRunning){
+            thread.start();
+        }
     }
     
-        public void elevationThreadR(final double target, final double deltaV){
+    public void elevationThreadR(final double target){
         
         final Thread thread = new Thread(new Runnable() {
             public void run(){
-                while ((target - getDegreesR()) > smallerDBL){
+                isThreadRunning = true;
+                while ((target - getDegreesR()) > smallerDBL && (Math.abs(getDegreesR() - getDegreesL()) < 5)){
                     if (target > getDegreesR()){
-                        elevatorTalonR.set(basePWM + deltaV);
+                        elevatorTalonR.set(basePWM + deltaV());
                     } else if (target < getDegreesR() && !lowerLimitR.get()){
-                        elevatorTalonR.set(-basePWM + deltaV);
+                        elevatorTalonR.set(-basePWM + deltaV());
+                    } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
+                        elevatorTalonR.set(0);
+                        break;
                     }
                 }
                 elevatorTalonR.set(0);
             }    
         });
-        thread.start();;
+        if (!isThreadRunning){
+            thread.start();;
+        }
     }
+    
+    public double deltaV(){
+           double deltaV;
+           double c = 0.05;//modifier to make an acceptable value at which to change the speed of elevator motors
+           return deltaV = (getDegreesL()-getDegreesR()) * c;
+    }    
         
     public static double getDegreesR(){
         double angle = (((MAXANGLE_R - MINANGLE_R)/(MAXVOLTAGE_R - MINVOLTAGE_R))*(currentAngleR - MINVOLTAGE_R) + MINANGLE_R);
