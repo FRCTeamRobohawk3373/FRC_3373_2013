@@ -33,7 +33,7 @@ public class Drive {
         } else if(!turbo && sniper){
             speed = 0.25; //In sniper mode
         } else {
-            speed = 0.5; //In default mode
+            speed = 0.75; //In default mode
         }
     }
    /* public void perspectiveControl(boolean a, boolean b, boolean x, boolean y){
