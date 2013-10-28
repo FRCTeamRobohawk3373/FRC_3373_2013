@@ -213,6 +213,11 @@ public class Team3373 extends SimpleRobot{
             camera.canRun = false;
             objShooter.canRun = false;
             elevator.elevateFlag = true;
+            elevator.isThreadRunningR = false;
+            elevator.isThreadRunningL = false;
+            elevator.elevatorTalonR.set(0);
+            elevator.elevatorTalonL.set(0);
+            elevator.isEnabledFlag = false;
             }
         }
     }
@@ -231,6 +236,8 @@ public class Team3373 extends SimpleRobot{
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
+        
+        elevator.isEnabledFlag = true;
    //objTableLookUp.test();
    /****************
    **Shooter Code***
@@ -396,8 +403,8 @@ public class Team3373 extends SimpleRobot{
         //String potString = Double.toString(pot1.getVoltage());
         //LCD.println(Line.kUser2, 1, potString);
         LCD.updateLCD();
-    
-        
+        boolean isTest = true;
+        if (!isTest) {
         /********************
          * Competition Code *
          ********************/
@@ -525,36 +532,51 @@ public class Team3373 extends SimpleRobot{
             stringPotVoltage = elevator.stringPotL.getVoltage();
             //System.out.println(stringPotVoltage);
             SmartDashboard.putBoolean("canRun", elevator.canRun);
+        }
         
-    }
-  
-}
-    public void test() {
-        
-        while (isEnabled() && isTest()) {
-            if (shooterController.isAHeld()){
-                elevator.elevatorTalonL.set(.4);
-            } else if (shooterController.isBHeld() && !elevator.lowerLimitL.get()){
-                elevator.elevatorTalonR.set(-.4);
-            } else elevator.elevatorTalonL.set(0);
-            if (shooterController.isXHeld()) {
-                elevator.elevatorTalonR.set(.4);
-            } else if (shooterController.isYHeld() && !elevator.lowerLimitR.get()){
-                elevator.elevatorTalonR.set(-.4);
-            } else elevator.elevatorTalonR.set(0);
-            //System.out.println("Limit: " + objShooter.shootLimit.get());
-            SmartDashboard.putNumber("Left Pot", elevator.currentAngleL);
-            SmartDashboard.putNumber("Right Pot", elevator.currentAngleR);
-            SmartDashboard.putBoolean("LeftLimit: ", elevator.lowerLimitL.get());
-            SmartDashboard.putBoolean("RightLimit", elevator.lowerLimitR.get());
-            SmartDashboard.putNumber("DeltaV: ", elevator.deltaV());
-            SmartDashboard.putNumber("LDegrees", elevator.getDegreesL());
-            SmartDashboard.putNumber("RDegrees", elevator.getDegreesR());
-            elevator.goToPotAngle(target);
-            LiveWindow.setEnabled(false);
+        if (isTest){
+            double testSpeed = .5;
+                
+               /* if (shooterController.isAHeld()){
+                    elevator.elevatorTalonL.set(testSpeed);
+                } else if (shooterController.isBHeld() && !elevator.lowerLimitL.get()){
+                    elevator.elevatorTalonL.set(-testSpeed);
+                } else elevator.elevatorTalonL.set(0);
+
+                
+                if (shooterController.isXHeld()) {
+                    elevator.elevatorTalonR.set(testSpeed);
+                } else if (shooterController.isYHeld() && !elevator.lowerLimitR.get()){
+                    elevator.elevatorTalonR.set(-testSpeed);
+                } else {
+                    elevator.elevatorTalonR.set(0);
+                }*/
+                
+                if(shooterController.isBackPushed()){
+                    elevator.goToPotAngle(20);
+                    System.out.println("Sent Command");
+                } 
+                
+                if (shooterController.isLBPushed()){
+                    elevator.goToPotAngle(27);
+                }
+
+                //System.out.println("Limit: " + objShooter.shootLimit.get());
+                SmartDashboard.putNumber("Left Pot", elevator.stringPotL.getVoltage());
+                SmartDashboard.putNumber("Right Pot", elevator.stringPotR.getVoltage());
+                SmartDashboard.putBoolean("LeftLimit: ", elevator.lowerLimitL.get());
+                SmartDashboard.putBoolean("RightLimit", elevator.lowerLimitR.get());
+                SmartDashboard.putNumber("DeltaV: ", elevator.deltaV());
+                SmartDashboard.putNumber("LDegrees", elevator.getDegreesL());
+                SmartDashboard.putNumber("RDegrees", elevator.getDegreesR());
+                SmartDashboard.putNumber("basePWM", elevator.basePWM);
+
+          
+        }
         }   
     }
 }
+
 
 
 
