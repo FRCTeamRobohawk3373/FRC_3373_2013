@@ -438,6 +438,23 @@ public class Team3373 extends SimpleRobot{
                 SmartDashboard.putNumber("LDegrees", elevator.getDegreesL());
                 SmartDashboard.putNumber("RDegrees", elevator.getDegreesR());
                 SmartDashboard.putNumber("basePWM", elevator.basePWM);
+                
+                if (shooterController.isRBHeld()){
+                    if (shooterController.isAHeld()){
+                        elevator.elevatorTalonL.set(testSpeed);
+                    } else if (shooterController.isBHeld() && !elevator.lowerLimitL.get()){
+                        elevator.elevatorTalonL.set(-testSpeed);
+                    } else elevator.elevatorTalonL.set(0);
+
+
+                    if (shooterController.isXHeld()) {
+                        elevator.elevatorTalonR.set(testSpeed);
+                    } else if (shooterController.isYHeld() && !elevator.lowerLimitR.get()){
+                        elevator.elevatorTalonR.set(-testSpeed);
+                    } else {
+                        elevator.elevatorTalonR.set(0);
+                    }
+                }
 
 
             }

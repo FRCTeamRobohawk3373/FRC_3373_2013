@@ -235,10 +235,15 @@ public class Elevator {
                 isThreadRunningL = true;
                 double speedL = 0;
                 while (Math.abs(target - getDegreesL()) > smallerDBL && isEnabledFlag){
+                    try {
+                        Thread.sleep(1L);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                     if (target > getDegreesL()){
                         speedL = basePWM - deltaV();
                     } else if (target < getDegreesL() && !lowerLimitL.get()){
-                        speedL = -basePWM - deltaV();
+                        speedL = -basePWM - (deltaV());
                         System.out.println("DeltaV: " + deltaV());
                     } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
                         speedL = 0;
@@ -265,10 +270,15 @@ public class Elevator {
                 isThreadRunningR = true;
                 double speedR = 0;
                 while (Math.abs(target - getDegreesR()) > smallerDBL && isEnabledFlag){
+                    try {
+                        Thread.sleep(1L);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                     if (target > getDegreesR() && (target - getDegreesR()) > smallerDBL){
                         speedR = basePWM + deltaV();
                     } else if (target < getDegreesR() && !lowerLimitR.get()){
-                        speedR = -basePWM + deltaV();
+                        speedR = -basePWM + (deltaV());
                     } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
                         speedR = 0;
                         break;
