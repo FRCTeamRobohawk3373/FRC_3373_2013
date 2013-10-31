@@ -243,7 +243,7 @@ public class Elevator {
                     if (target > getDegreesL()){
                         speedL = basePWM - deltaV();
                     } else if (target < getDegreesL() && !lowerLimitL.get()){
-                        speedL = -basePWM - (deltaV());
+                        speedL = -(.8*basePWM) - deltaV();
                         System.out.println("DeltaV: " + deltaV());
                     } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
                         speedL = 0;
