@@ -244,13 +244,13 @@ public class Elevator {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                    if (target > getDegreesL() && target < MAXANGLE_L){
+                    if (target > getDegreesL() && target < 40){
                         speedL = basePWM - deltaV();
                     } else if (target < getDegreesL() && !lowerLimitL.get()){
                         double PWMModifier  = 1;
-                        /*if ((getDegreesL() - getDegreesR()) < -.3){
+                        if ((getDegreesL() - getDegreesR()) < -.3){
                             PWMModifier = .7;
-                        } else PWMModifier = 1;*/
+                        } else PWMModifier = 1;
                         speedL = -(basePWM*PWMModifier) - deltaV();
                         System.out.println("DeltaV: " + deltaV());
                     } else if (Math.abs(getDegreesR() - getDegreesL()) > 2){
@@ -292,7 +292,7 @@ public class Elevator {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                    if (target > getDegreesR() && target < MAXANGLE_R){
+                    if (target > getDegreesR() && target < 40){
                         speedR = basePWM + deltaV();
                     } else if (target < getDegreesR() && !lowerLimitR.get()){
                         double PWMModifier = 1;

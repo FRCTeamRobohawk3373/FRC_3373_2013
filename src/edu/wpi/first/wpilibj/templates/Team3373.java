@@ -92,11 +92,11 @@ public class Team3373 extends SimpleRobot{
    double rotateTest = 2.7;
    double autonomousSpeedTarget = 1;
    boolean autoFlag = true;
-   double feedAngle = 0.84;
-   double climbAngle = elevator.MAXANGLE_R;
+   double feedAngle = 26.7;
+   double climbAngle = 36.3;
    double autoTarget;
-   double backAuto = 1.750;
-   double frontAuto = 2.470;
+   double backAuto = 29.5;
+   double frontAuto = 37.0;
    double backMiddle = 1.567; 
    double[] targetSlot;
    double[] targetAngle;
@@ -116,31 +116,18 @@ public class Team3373 extends SimpleRobot{
             objShooter.canRun = true;                
             if (frontBackSwitch.get()){ //further away, right side, value returned is also feed/climb position
                 SmartDashboard.putString("autonomus location: ", "From back of period");
-                autoTarget = backAuto;//lookUp.lookUpAngle(18, lookUp.distanceHigh, lookUp.angleHigh);
+                elevator.goToPotAngle(backAuto);;//lookUp.lookUpAngle(18, lookUp.distanceHigh, lookUp.angleHigh);
                 //System.out.println("Target1="+autoTarget);
             } else { //close, right
-                autoTarget = frontAuto;//lookUp.lookUpAngle(10, lookUp.distanceHigh, lookUp.angleHigh);
+                elevator.goToPotAngle(frontAuto);;//lookUp.lookUpAngle(10, lookUp.distanceHigh, lookUp.angleHigh);
                 SmartDashboard.putString("autonomus location: ", "From front of pyramid");
                 //System.out.println("Target3="+autoTarget);
             }
+            
                 
                 
             //autoTarget = 3.16;
-            while (autoFlag){
-                try {
-                    Thread.sleep(10L);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
-                
-                if (autoTarget > 0) {
-                    elevator.goToPotAngle(autoTarget);
-                }
-                
-                if (!elevator.elevateFlag) {
-                    autoFlag = false;
-                }
-            }
+
             
             objShooter.goToSpeed(autonomousSpeedTarget*.33);
                   
@@ -363,13 +350,13 @@ public class Team3373 extends SimpleRobot{
                     controlFlag = true;
                     //elevator.canRun = true;
                     elevator.elevateFlag = true;
-                    elevator.goToPotAngle(elevator.MAXANGLE_R);
+                    elevator.goToPotAngle(climbAngle);
                 
                 }
             
 
                 if(driveStick.isYPushed()){
-                    elevator.goToPotAngle(elevator.MINANGLE_L);       
+                    elevator.goToPotAngle(16.2);       
 
                 }
             
@@ -415,9 +402,9 @@ public class Team3373 extends SimpleRobot{
                     System.out.println("Sent Command");
                 } 
 
-                if (shooterController.isLBPushed()){
+                /*if (shooterController.isLBPushed()){
                     elevator.goToPotAngle(36);
-                }
+                }*/
                 
                 if (shooterController.isStartPushed()){
                     elevator.goToPotAngle(elevator.MINANGLE_L);
@@ -433,12 +420,23 @@ public class Team3373 extends SimpleRobot{
                 SmartDashboard.putNumber("basePWM", elevator.basePWM);
                 
                 if (shooterController.isAPushed()){
-                    elevator.goToPotAngle((elevator.getDegreesL() + 1));
+                    elevator.goToPotAngle((elevator.getDegreesL() + .5));
                 }
                 
                 if (shooterController.isBPushed()){
-                    elevator.goToPotAngle(elevator.getDegreesL() - 1);
+                    elevator.goToPotAngle(elevator.getDegreesL() - .5);
                 }
+                
+                if (shooterController.isLBPushed()){
+                    objShooter.shooterThread();
+                }
+                
+                if (shooterController.isRBPushed()){
+                    objShooter.goToSpeed(.25);
+                }
+                
+                drive.drive(newMath.toTheThird(deadband.zero(driveStick.getRawAxis(LX), 0.1)), newMath.toTheThird(deadband.zero(driveStick.getRawAxis(RX), 0.1)), newMath.toTheThird(deadband.zero(driveStick.getRawAxis(LY), 0.1)));
+
                 
                 /*if (shooterController.isRBHeld()){
                     if (shooterController.isAHeld()){
