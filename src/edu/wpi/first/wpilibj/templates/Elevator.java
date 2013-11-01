@@ -162,7 +162,9 @@ public class Elevator {
         elevationTarget = a;
         goToFlag = true;
     }
-    public void goTo(final double target){ //NOW uses StringPot.getVoltage to read voltage to move elevator, changes marked below
+    
+
+    public void goTo(final double target){ //NOW uses StringPot.getVoltage to read voltage to move elevator, changes marked below. Now deprecated
         final Thread thread = new Thread(new Runnable() {
         public void run(){
                 goToFlag = false;
@@ -217,7 +219,7 @@ public class Elevator {
     }*/
     
     public void goToPotAngle(double target){
-        double DBL = 1; //deadband Constant
+        double DBL = .25; //deadband Constant
         double deltaPosition = Math.abs(target - getDegreesL());
         if (deltaPosition > DBL){
             elevationThreadL(target);
@@ -240,13 +242,15 @@ public class Elevator {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                    if (target > getDegreesL()){
+                    if (target > getDegreesL() && target < MAXANGLE_L){
                         speedL = basePWM - deltaV();
                     } else if (target < getDegreesL() && !lowerLimitL.get()){
-                        speedL = -(.8*basePWM) - deltaV();
+                        speedL = -basePWM - deltaV();
                         System.out.println("DeltaV: " + deltaV());
                     } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
                         speedL = 0;
+                        break;
+                    } else if (target > MAXANGLE_L || target < MINANGLE_L){
                         break;
                     }
                     System.out.println("SpeedL:" + speedL);
@@ -275,10 +279,12 @@ public class Elevator {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                    if (target > getDegreesR() && (target - getDegreesR()) > smallerDBL){
+                    if (target > getDegreesR() && target < MAXANGLE_R){
                         speedR = basePWM + deltaV();
                     } else if (target < getDegreesR() && !lowerLimitR.get()){
                         speedR = -basePWM + (deltaV());
+                    } else if (target > MAXANGLE_R || target < MINANGLE_R) {
+                        break;
                     } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
                         speedR = 0;
                         break;

@@ -93,7 +93,7 @@ public class Team3373 extends SimpleRobot{
    double autonomousSpeedTarget = 1;
    boolean autoFlag = true;
    double feedAngle = 0.84;
-   double climbAngle = elevator.maxLimit;
+   double climbAngle = elevator.MAXANGLE_R;
    double autoTarget;
    double backAuto = 1.750;
    double frontAuto = 2.470;
@@ -134,7 +134,7 @@ public class Team3373 extends SimpleRobot{
                 }
                 
                 if (autoTarget > 0) {
-                    elevator.goTo(autoTarget);
+                    elevator.goToPotAngle(autoTarget);
                 }
                 
                 if (!elevator.elevateFlag) {
@@ -292,14 +292,14 @@ public class Team3373 extends SimpleRobot{
                     controlFlag = true;
                     //elevator.canRun = true;
                     elevator.elevateFlag = true;
-                    elevator.goTo(frontAuto);//lookUp.lookUpAngle(10, lookUp.distanceHigh, lookUp.angleHigh));
+                    elevator.goToPotAngle(frontAuto);//lookUp.lookUpAngle(10, lookUp.distanceHigh, lookUp.angleHigh));
                 }
                 
                 if (shooterController.isYPushed()){
                     controlFlag = true;
                     //elevator.canRun = true;
                     elevator.elevateFlag = true;
-                    elevator.goTo(backAuto);//lookUp.lookUpAngle(18, lookUp.distanceHigh, lookUp.angleHigh));
+                    elevator.goToPotAngle(backAuto);//lookUp.lookUpAngle(18, lookUp.distanceHigh, lookUp.angleHigh));
                 }
                 
                 //SmartDashboard.putNumber("Voltage", elevator.angleMeter.getVoltage());
@@ -309,13 +309,13 @@ public class Team3373 extends SimpleRobot{
                     controlFlag = true;
                     //elevator.canRun = true;
                     elevator.elevateFlag = true;
-                    elevator.goTo(lookUp.lookUpAngle(camera.middle_distance, targetSlot, targetAngle));
+                    elevator.goToPotAngle(lookUp.lookUpAngle(camera.middle_distance, targetSlot, targetAngle));
                 }
                 
                 if (shooterController.isBPushed()){
                     controlFlag = true;
                     elevator.elevateFlag = true;
-                    elevator.goTo(backMiddle);
+                    elevator.goToPotAngle(backMiddle);
                 }
                 
                 //SmartDashboard.putNumber("Current Voltage: ", elevator.currentAngle);
@@ -363,29 +363,22 @@ public class Team3373 extends SimpleRobot{
                     controlFlag = true;
                     //elevator.canRun = true;
                     elevator.elevateFlag = true;
-                    elevator.goTo(climbAngle);
+                    elevator.goToPotAngle(elevator.MAXANGLE_R);
                 
                 }
             
 
                 if(driveStick.isYPushed()){
-                    //elevator.canRun = true;
-                    controlFlag = false;
+                    elevator.goToPotAngle(elevator.MINANGLE_L);       
+
                 }
             
                 if (driveStick.isBPushed()) {
                     //elevator.canRun = true;
                     elevator.elevateFlag = true;
-                    elevator.goTo(feedAngle);
+                    elevator.goToPotAngle(feedAngle);
                 }
            
-                if (!controlFlag){
-                     elevator.lower();
-                     if (elevator.lowerLimitL.get()){
-                         elevator.off();
-                         controlFlag = true;
-                     }
-                 }
                 
                 //SmartDashboard.putNumber("Servo: ", cameraControl.cameraServo.get());
             
@@ -395,12 +388,8 @@ public class Team3373 extends SimpleRobot{
                 * Add thread safety
                 * Add a fourth shoot in autonomous (Maybe)
                 * Goto starting height: 2.668
-                ************/
-                
-                double stringPotVoltage;
-                stringPotVoltage = elevator.stringPotL.getVoltage();
-                //System.out.println(stringPotVoltage);
-                SmartDashboard.putBoolean("canRun", elevator.canRun);
+                */
+
             }
         
             if (isTest){ //ENABLE TEST MODE!
@@ -429,6 +418,10 @@ public class Team3373 extends SimpleRobot{
                 if (shooterController.isLBPushed()){
                     elevator.goToPotAngle(27);
                 }
+                
+                if (shooterController.isStartPushed()){
+                    elevator.goToPotAngle(elevator.MINANGLE_L);
+                }
 
                 SmartDashboard.putNumber("Left Pot", elevator.stringPotL.getVoltage());
                 SmartDashboard.putNumber("Right Pot", elevator.stringPotR.getVoltage());
@@ -439,22 +432,14 @@ public class Team3373 extends SimpleRobot{
                 SmartDashboard.putNumber("RDegrees", elevator.getDegreesR());
                 SmartDashboard.putNumber("basePWM", elevator.basePWM);
                 
-                if (shooterController.isRBHeld()){
-                    if (shooterController.isAHeld()){
-                        elevator.elevatorTalonL.set(testSpeed);
-                    } else if (shooterController.isBHeld() && !elevator.lowerLimitL.get()){
-                        elevator.elevatorTalonL.set(-testSpeed);
-                    } else elevator.elevatorTalonL.set(0);
-
-
-                    if (shooterController.isXHeld()) {
-                        elevator.elevatorTalonR.set(testSpeed);
-                    } else if (shooterController.isYHeld() && !elevator.lowerLimitR.get()){
-                        elevator.elevatorTalonR.set(-testSpeed);
-                    } else {
-                        elevator.elevatorTalonR.set(0);
-                    }
+                if (shooterController.isAPushed()){
+                    elevator.goToPotAngle((elevator.getDegreesL() + 1));
                 }
+                
+                if (shooterController.isBPushed()){
+                    elevator.goToPotAngle(elevator.getDegreesL() - 1);
+                }
+                    
 
 
             }
