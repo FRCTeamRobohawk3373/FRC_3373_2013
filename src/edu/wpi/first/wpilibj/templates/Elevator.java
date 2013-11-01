@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.templates.Team3373;
 
 /**
@@ -222,8 +223,9 @@ public class Elevator {
         double DBL = .25; //deadband Constant
         double deltaPosition = Math.abs(target - getDegreesL());
         if (deltaPosition > DBL){
-            elevationThreadL(target);
             elevationThreadR(target);
+            elevationThreadL(target);
+            
         } else {
             elevatorTalonR.set(0);
             elevatorTalonL.set(0);
@@ -245,15 +247,26 @@ public class Elevator {
                     if (target > getDegreesL() && target < MAXANGLE_L){
                         speedL = basePWM - deltaV();
                     } else if (target < getDegreesL() && !lowerLimitL.get()){
-                        speedL = -basePWM - deltaV();
+                        double PWMModifier  = 1;
+                        /*if ((getDegreesL() - getDegreesR()) < -.3){
+                            PWMModifier = .7;
+                        } else PWMModifier = 1;*/
+                        speedL = -(basePWM*PWMModifier) - deltaV();
                         System.out.println("DeltaV: " + deltaV());
-                    } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
+                    } else if (Math.abs(getDegreesR() - getDegreesL()) > 2){
                         speedL = 0;
                         break;
                     } else if (target > MAXANGLE_L || target < MINANGLE_L){
+                        speedL = 0;
                         break;
+                    } else {
+                       speedL = 0;
+                       break;
                     }
+                    
+                    
                     System.out.println("SpeedL:" + speedL);
+                    SmartDashboard.putNumber("SpeedL:", speedL);
                     elevatorTalonL.set(speedL);
                     
                 }
@@ -282,15 +295,25 @@ public class Elevator {
                     if (target > getDegreesR() && target < MAXANGLE_R){
                         speedR = basePWM + deltaV();
                     } else if (target < getDegreesR() && !lowerLimitR.get()){
-                        speedR = -basePWM + (deltaV());
+                        double PWMModifier = 1;
+                        if ((getDegreesL() - getDegreesR()) < -.3){
+                            PWMModifier = 1.2;
+                        } else {
+                            PWMModifier = 1;
+                        }
+                        speedR = -(basePWM * PWMModifier) + (deltaV());
                     } else if (target > MAXANGLE_R || target < MINANGLE_R) {
                         break;
-                    } else if (Math.abs(getDegreesR() - getDegreesL()) > 5){
+                    } else if (Math.abs(getDegreesR() - getDegreesL()) > 2){
+                        speedR = 0;
+                        break;
+                    } else {
                         speedR = 0;
                         break;
                     }
                     elevatorTalonR.set(speedR);
                     System.out.println("SpeedR: " + speedR);
+                    SmartDashboard.putNumber("SpeedR: ", speedR);
                 }
                 elevatorTalonR.set(0);
                 isThreadRunningR = false;

@@ -411,12 +411,12 @@ public class Team3373 extends SimpleRobot{
                 }*/
 
                 if(shooterController.isBackPushed()){
-                    elevator.goToPotAngle(20);
+                    elevator.goToPotAngle(17);
                     System.out.println("Sent Command");
                 } 
 
                 if (shooterController.isLBPushed()){
-                    elevator.goToPotAngle(27);
+                    elevator.goToPotAngle(36);
                 }
                 
                 if (shooterController.isStartPushed()){
@@ -439,7 +439,23 @@ public class Team3373 extends SimpleRobot{
                 if (shooterController.isBPushed()){
                     elevator.goToPotAngle(elevator.getDegreesL() - 1);
                 }
-                    
+                
+                /*if (shooterController.isRBHeld()){
+                    if (shooterController.isAHeld()){
+                        elevator.elevatorTalonR.set(testSpeed);
+                    } else if (shooterController.isBHeld() && !elevator.lowerLimitL.get()){
+                        elevator.elevatorTalonR.set(-testSpeed);
+                    } else elevator.elevatorTalonR.set(0);
+
+
+                    if (shooterController.isXHeld()) {
+                        elevator.elevatorTalonL.set(testSpeed);
+                    } else if (shooterController.isYHeld() && !elevator.lowerLimitR.get()){
+                        elevator.elevatorTalonL.set(-testSpeed);
+                    } else {
+                        elevator.elevatorTalonL.set(0);
+                    }
+                }*/
 
 
             }
