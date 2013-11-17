@@ -92,8 +92,8 @@ public class Team3373 extends SimpleRobot{
    double rotateTest = 2.7;
    double autonomousSpeedTarget = 1;
    boolean autoFlag = true;
-   double feedAngle = 26.7;
-   double climbAngle = 36.3;
+   double feedAngle = 25.7;
+   double climbAngle = 35.7;
    double autoTarget;
    double backAuto = 29.5;
    double frontAuto = 37.0;
@@ -113,21 +113,23 @@ public class Team3373 extends SimpleRobot{
         if (isAutonomous() && isEnabled()){
             elevator.canRun = true;
             camera.canRun = true;
-            objShooter.canRun = true;                
+            objShooter.canRun = true;
+            elevator.isEnabledFlag = true;
             if (frontBackSwitch.get()){ //further away, right side, value returned is also feed/climb position
                 SmartDashboard.putString("autonomus location: ", "From back of period");
-                elevator.goToPotAngle(backAuto);;//lookUp.lookUpAngle(18, lookUp.distanceHigh, lookUp.angleHigh);
+                elevator.goToPotAngle(29.5);;//lookUp.lookUpAngle(18, lookUp.distanceHigh, lookUp.angleHigh);
                 //System.out.println("Target1="+autoTarget);
             } else { //close, right
-                elevator.goToPotAngle(frontAuto);;//lookUp.lookUpAngle(10, lookUp.distanceHigh, lookUp.angleHigh);
+                elevator.goToPotAngle(37);;//lookUp.lookUpAngle(10, lookUp.distanceHigh, lookUp.angleHigh);
                 SmartDashboard.putString("autonomus location: ", "From front of pyramid");
                 //System.out.println("Target3="+autoTarget);
             }
-            
-                
-                
-            //autoTarget = 3.16;
-
+            try {
+                //autoTarget = 3.16;
+                Thread.sleep(4500L);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
             
             objShooter.goToSpeed(autonomousSpeedTarget*.33);
                   
@@ -250,7 +252,7 @@ public class Team3373 extends SimpleRobot{
             shooterController.clearButtons();
        
             LCD.updateLCD();
-            boolean isTest = true;
+            boolean isTest = false;
             
             if (!isTest) {
             /********************
@@ -277,36 +279,31 @@ public class Team3373 extends SimpleRobot{
                 
                 if (shooterController.isXPushed()){
                     controlFlag = true;
-                    //elevator.canRun = true;
                     elevator.elevateFlag = true;
                     elevator.goToPotAngle(frontAuto);//lookUp.lookUpAngle(10, lookUp.distanceHigh, lookUp.angleHigh));
                 }
                 
                 if (shooterController.isYPushed()){
                     controlFlag = true;
-                    //elevator.canRun = true;
                     elevator.elevateFlag = true;
                     elevator.goToPotAngle(backAuto);//lookUp.lookUpAngle(18, lookUp.distanceHigh, lookUp.angleHigh));
                 }
                 
-                //SmartDashboard.putNumber("Voltage", elevator.angleMeter.getVoltage());
-                if (shooterController.isBackPushed()){ 
+                /*if (shooterController.isBackPushed()){ //potentially irrelevant
                      //System.out.println("Going to target");
-                    //SmartDashboard.putNumber("Target Voltage: ", lookUp.lookUpAngle(camera.middle_distance, targetSlot, targetAngle));
                     controlFlag = true;
-                    //elevator.canRun = true;
-                    elevator.elevateFlag = true;
                     elevator.goToPotAngle(lookUp.lookUpAngle(camera.middle_distance, targetSlot, targetAngle));
+                }*/
+                if (shooterController.isBackPushed()){
+                    controlFlag = true;
+                    objShooter.loadFrisbee(elevator);
                 }
-                
                 if (shooterController.isBPushed()){
                     controlFlag = true;
                     elevator.elevateFlag = true;
-                    elevator.goToPotAngle(backMiddle);
+                    elevator.goToPotAngle(feedAngle);
                 }
                 
-                //SmartDashboard.putNumber("Current Voltage: ", elevator.currentAngle);
-                //SmartDashboard.putBoolean("Shooting: ", objShooter.busyStatus); 
                 if (shooterController.isAPushed() && objShooter.busyStatus){  
                     objShooter.shooterThread();
                 }
@@ -355,8 +352,10 @@ public class Team3373 extends SimpleRobot{
                 }
             
 
-                if(driveStick.isYPushed()){
-                    elevator.goToPotAngle(16.2);       
+                if(driveStick.isYPushed()){ //goes down to bottom to hang
+                    controlFlag = true;
+                    elevator.elevateFlag = true;
+                    elevator.goToPotAngle(17.0);       
 
                 }
             
@@ -365,7 +364,8 @@ public class Team3373 extends SimpleRobot{
                     elevator.elevateFlag = true;
                     elevator.goToPotAngle(feedAngle);
                 }
-           
+                
+                
                 
                 //SmartDashboard.putNumber("Servo: ", cameraControl.cameraServo.get());
             
