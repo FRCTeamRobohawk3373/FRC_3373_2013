@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
  * creating this project, you must also update the manifest file in the resource
  * directory. 
  */
-public class Team3373 extends SimpleRobot{
+public class RobotTemplate extends SimpleRobot{
     /**
      * This function is called once each time the robot enters autonomous mode.
      */
@@ -104,7 +104,7 @@ public class Team3373 extends SimpleRobot{
    //double climbingPosition = 2.75;
    boolean controlFlag = true;
            
-   public Team3373(){
+   public RobotTemplate(){
       //camera.robotInit();
    }
 
